@@ -1,7 +1,10 @@
-﻿using System;
+﻿using Newtonsoft.Json.Serialization;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web.Http;
+using System.Web.Http.Cors;
+
 
 namespace Tickets
 {
@@ -18,7 +21,23 @@ namespace Tickets
                 name: "DefaultApi",
                 routeTemplate: "api/{controller}/{id}",
                 defaults: new { id = RouteParameter.Optional }
+
             );
+
+            var cors = new EnableCorsAttribute("http://localhost:8080", "*", "*");
+            config.EnableCors(cors);
+
+            // Set JSON formatter as default one and remove XmlFormatter
+
+            var jsonFormatter = config.Formatters.JsonFormatter;
+
+            jsonFormatter.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
+
+            // Remove the XML formatter
+            config.Formatters.Remove(config.Formatters.XmlFormatter);
+
+            jsonFormatter.SerializerSettings.DateTimeZoneHandling = Newtonsoft.Json.DateTimeZoneHandling.Utc;
+
         }
     }
 }
